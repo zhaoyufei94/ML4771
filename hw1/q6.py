@@ -185,7 +185,7 @@ def main(max_depth):
     return int(test_accuracy),int(train_accuracy)
 
 test_accuracy,train_accuracy = main(10)
-print test_accuracy,train_accuracy
+print('test_accuracy='+str(test_accuracy)+"% \n" "train_accuracy="+str(train_accuracy)+"%")
 # testset_error_rates=[]
 # trainset_error_rates=[]
 # for K in (range(1,25,1)):
