@@ -73,20 +73,20 @@ def perceptron_pass2(lines, classifier):
         p.value = count
         p.description = "{}%".format(round(100*p.value/p.max, 2))
     p.description = "Done"
-    t2 = time.time()
-    print("pass 2 takes {} minutes".format((t2-t0)/60))
     return c
 
 def test(lines, classifier):
     count = 0
     correct = 0
+    p = IntProgress(max = len(lines))
+    display(p)
     for line in lines:
         count += 1
         label, feature = get_label_feature(line)
         value = get_value(classifier, feature)
         if label * value >= 0:
             correct += 1
-    print(correct, count)
+        p.value = count
     return correct / count
 
 
@@ -114,7 +114,8 @@ print("test")
 accuracy = test(lines, classifier)
 file.close()
 print(accuracy)
-
+"""
 open ("./unigram", "wb") as f:
     f.write(marshal.dump(classifier))
 f.close()
+"""
