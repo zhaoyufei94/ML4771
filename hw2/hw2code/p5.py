@@ -1,5 +1,9 @@
+import time
 import sys
 import random
+import marshal
+from ipywidgets import IntProgress
+from IPython.display import display
 
 def get_label_feature(line):
     line = line[0:-1].split(",")
@@ -27,6 +31,8 @@ def get_value(classifier, feature):
 
 
 def perceptron_pass1(lines, classifier):
+    p = IntProgress(max = len(lines))
+    display(p)
     random.shuffle(lines)
     for line in lines:
         label, feature = get_label_feature(line)
@@ -39,13 +45,19 @@ def perceptron_pass1(lines, classifier):
                     classifier[word] = label * feature[word]
                 else:
                     classifier[word] += label * feature[word]
+        p.value += 1
+        p.description = "{}%".format(round(100*(p.value/p.max), 1))
     return classifier
 
 def perceptron_pass2(lines, classifier):
-    c = {}
-    random.shuffle(lines)
     n = len(lines)
+    count = 0
+    p = IntProgress(max = n)
+    display(p)
+    c = classifier
+    random.shuffle(lines)
     for line in lines:
+        count += 1
         label, feature = get_label_feature(line)
         value = get_value(classifier, feature)
         if label * value > 0:
@@ -54,15 +66,15 @@ def perceptron_pass2(lines, classifier):
             for word in feature:
                 if None == classifier.get(word):
                     classifier[word] = label * feature[word]
+                    c[word] = label * feature[word] * (n - count) / n
                 else:
                     classifier[word] += label * feature[word]
-        for word in classifier:
-            if None == c.get(word):
-                c[word] = classifier[word] / n
-            else:
-                c[word] += classifier[word] / n
-        bar.move()
-        bar.log()
+                    c[word] += label * feature[word] * (n - count) / n
+        p.value = count
+        p.description = "{}%".format(round(100*p.value/p.max, 2))
+    p.description = "Done"
+    t2 = time.time()
+    print("pass 2 takes {} minutes".format((t2-t0)/60))
     return c
 
 def test(lines, classifier):
@@ -72,13 +84,14 @@ def test(lines, classifier):
         count += 1
         label, feature = get_label_feature(line)
         value = get_value(classifier, feature)
-        if label * value > 0:
+        if label * value >= 0:
             correct += 1
+    print(correct, count)
     return correct / count
+
 
 train_path = "../hw2data_1/reviews_tr.csv"
 test_path = "../hw2data_1/reviews_te.csv"
-
 
 file = open(train_path, "r")
 _ = file.readline()
@@ -101,5 +114,7 @@ print("test")
 accuracy = test(lines, classifier)
 file.close()
 print(accuracy)
-#print(count)
-#print(classifier)
+
+open ("./unigram", "wb") as f:
+    f.write(marshal.dump(classifier))
+f.close()
