@@ -1,17 +1,19 @@
-import time
-import sys
-import random
+import marshal
 import math
-#import marshal
-from ipywidgets import IntProgress
-from IPython.display import display
+import random
+import time
 from os.path import dirname, abspath
+
+from IPython.display import display
+from ipywidgets import IntProgress
+
 d = dirname(abspath(__file__))
-d = d.replace('\\','/')
+d = d.replace('\\', '/')
+
 
 def get_idf_para(lines):
     n = len(lines)
-    word_count_in_docu = {}
+    word_count_in_doc = {}
     for line in lines:
         line = line[0:-1].split(",")
         text = line[1].split(" ")
@@ -19,15 +21,16 @@ def get_idf_para(lines):
         for word in text:
             flag[word] = 0
         for word in text:
-            if word_count_in_docu.get(word)==None:
-                word_count_in_docu[word] = 1
+            if None is word_count_in_doc.get(word):
+                word_count_in_doc[word] = 1
                 flag[word] = 1
             elif flag[word] != 1:
-                word_count_in_docu[word] += 1
+                word_count_in_doc[word] += 1
                 flag[word] = 1
-    return n, word_count_in_docu
-		
-def get_label_feature(line,n,word_count_in_docu):
+    return n, word_count_in_doc
+
+
+def get_label_feature(line, n, word_count_in_doc):
     line = line[0:-1].split(",")
     if "1" == line[0]:
         label = 1
@@ -41,11 +44,12 @@ def get_label_feature(line,n,word_count_in_docu):
             tf[word] = 1
         else:
             tf[word] += 1
-    
+
     for key in tf:
-        feature[key] = tf[key]*math.log10(n/word_count_in_docu[key])
-    
+        feature[key] = tf[key] * math.log10(n / word_count_in_doc[key])
+
     return label, feature
+
 
 def get_value(classifier, feature):
     value = 0
@@ -57,12 +61,12 @@ def get_value(classifier, feature):
     return value
 
 
-def perceptron_pass1(lines, classifier,n,word_count_in_docu):
-    p = IntProgress(max = len(lines))
+def perceptron_pass1(lines, classifier, n, word_count_in_docu):
+    p = IntProgress(max=len(lines))
     display(p)
     random.shuffle(lines)
     for line in lines:
-        label, feature = get_label_feature(line,n,word_count_in_docu)
+        label, feature = get_label_feature(line, n, word_count_in_docu)
         value = get_value(classifier, feature)
         if label * value > 0:
             pass
@@ -73,19 +77,20 @@ def perceptron_pass1(lines, classifier,n,word_count_in_docu):
                 else:
                     classifier[word] += label * feature[word]
         p.value += 1
-        p.description = "{}%".format(round(100*(p.value/p.max), 1))
+        p.description = "{}%".format(round(100 * (p.value / p.max), 1))
     return classifier
 
-def perceptron_pass2(lines, classifier,n,word_count_in_docu):
+
+def perceptron_pass2(lines, classifier, n, word_count_in_docu):
     n = len(lines)
     count = 0
-    p = IntProgress(max = n)
+    p = IntProgress(max=n)
     display(p)
     c = classifier
     random.shuffle(lines)
     for line in lines:
         count += 1
-        label, feature = get_label_feature(line,n,word_count_in_docu)
+        label, feature = get_label_feature(line, n, word_count_in_docu)
         value = get_value(classifier, feature)
         if label * value > 0:
             pass
@@ -98,27 +103,29 @@ def perceptron_pass2(lines, classifier,n,word_count_in_docu):
                     classifier[word] += label * feature[word]
                     c[word] += label * feature[word] * (n - count) / n
         p.value = count
-        p.description = "{}%".format(round(100*p.value/p.max, 2))
+        p.description = "{}%".format(round(100 * p.value / p.max, 2))
     p.description = "Done"
     return c
 
-def test(lines, classifier,n,word_count_in_docu):
+
+def test(lines, classifier, n, word_count_in_doc):
     count = 0
     correct = 0
-    p = IntProgress(max = len(lines))
+    p = IntProgress(max=len(lines))
     display(p)
     for line in lines:
         count += 1
-        label, feature = get_label_feature(line,n,word_count_in_docu)
+        label, feature = get_label_feature(line, n, word_count_in_doc)
         value = get_value(classifier, feature)
         if label * value >= 0:
             correct += 1
         p.value = count
     return correct / count
 
+
 start_time = time.time()
-train_path = d+"/reviews_tr.csv"
-test_path = d+"/reviews_te.csv"
+train_path = d + "/reviews_tr.csv"
+test_path = d + "/reviews_te.csv"
 
 file = open(train_path, "r")
 _ = file.readline()
@@ -127,28 +134,26 @@ classifier = {}
 lines = file.readlines()
 
 print("pass1")
-n, word_count_in_docu = get_idf_para(lines)
-classifier = perceptron_pass1(lines, classifier,n,word_count_in_docu)
+n, word_count_in_doc = get_idf_para(lines)
+classifier = perceptron_pass1(lines, classifier, n, word_count_in_doc)
 
 print("pass2")
-classifier = perceptron_pass2(lines, classifier,n,word_count_in_docu)
+classifier = perceptron_pass2(lines, classifier, n, word_count_in_doc)
 
 file.close()
 
 file = open(test_path, "r")
 _ = file.readline()
 lines = file.readlines()
-n, word_count_in_docu = get_idf_para(lines)
+n, word_count_in_doc = get_idf_para(lines)
 
 print("test")
-accuracy = test(lines, classifier,n,word_count_in_docu)
+accuracy = test(lines, classifier, n, word_count_in_doc)
 file.close()
 print(accuracy)
 # your code
 elapsed_time = time.time() - start_time
 print(elapsed_time)
-"""
-open ("./unigram", "wb") as f:
-    f.write(marshal.dump(classifier))
-f.close()
-"""
+
+with open(d + "/tfidf", "wb") as f:
+    f.write(marshal.dumps(classifier))
