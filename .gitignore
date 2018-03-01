@@ -1,3 +1,5 @@
 .DS_Store
 *.cls
 *.m~
+*.mat
+hw2data_1

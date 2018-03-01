@@ -1,0 +1,36 @@
+full test with train sample
+first 20w:                      last 20w:
+	unigram : 91%					unigram : 85.5%
+	bigram : 86.9%					bigram : 88.2%
+	tfidf : 85.5%					tfidf : 85.3%
+	
+first 50w:                      last 50w:
+	unigram : 87.9%                 unigram : 87%
+	bigram : 87.9%             	    bigram : 85.2%
+	tfidf : 85.7%	                tfidf : 85.2%
+
+first 80w:                      last 80w:
+	unigram : 87.1%                 unigram : 86.9%
+	bigram : 87.9%                  bigram : 88.0%
+	tfidf : 85.4%                   tfidf : 85.1%
+
+full train with test sample
+first 20%:
+	unigram : 86.4%
+	bigram : 88.0%
+	tfidf : 85.1%
+
+first 50%:
+	unigram : 83.5%
+	bigram : 87.3%
+	tfidf : 85.0%
+
+first 80%:
+	unigram : 83.6%
+	bigram : 87.9%
+	tfidf : 85.6%
+
+origin:
+	unigram : 87.5
+	bigram : 87.7%
+	tfidf : 85.3%
