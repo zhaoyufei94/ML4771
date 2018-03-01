@@ -31,6 +31,6 @@ first 80%:
 	tfidf : 85.6%
 
 origin:
-	unigram : 87.5
+	unigram : 87.5%
 	bigram : 87.7%
 	tfidf : 85.3%
