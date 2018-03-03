@@ -5,9 +5,12 @@ The main code in unigram.py, tfidf.py and bigram.py are the same, we
 detailly comment unigram.py and only comment tfidf.py and bigram.py 
 where they are different with unigram.py
 
-For some suporting files:
+For some supporting files:
 1. The cutout.py is used for spliting the original training and 
 testing dataset to smaller ones such that we can compare the dataset 
 size's impact on accuracy.
 2. The sort_weight.py is used for getting the highest 10 and lowest 
 10 weighted words from classifiers. 
+3. The result.txt stores the comparison conclusion from different size 
+of dataset.
+4. The folder pics also stores some comparison results in graph form.
