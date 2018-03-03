@@ -13,11 +13,13 @@ def get_label_feature(line):
         label = -1
     text = line[1].split(" ")
     feature = {"BIAS": 1}
-    for word in text:
-        if None == feature.get(word):
-            feature[word] = 1
+    for i in range(len(text)-1):
+        pair = (text[i], text[i+1])
+        # instead of a single word, the feature of a sample is a pair of words
+        if None == feature.get(pair):
+            feature[pair] = 1
         else:
-            feature[word] += 1
+            feature[pair] += 1
     return label, feature
 
 def get_value(classifier, feature):
@@ -115,7 +117,7 @@ accuracy = test(lines, classifier)
 file.close()
 print(accuracy)
 """
-open ("./unigram", "wb") as f:
+open ("./bigram", "wb") as f:
     f.write(marshal.dump(classifier))
 f.close()
 """

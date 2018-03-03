@@ -6,22 +6,24 @@ from ipywidgets import IntProgress
 from IPython.display import display
 
 def get_label_feature(line):
+    # read a line from training set, get the label {0, 1}
+    # and the feature (appear time for each word in this line)
     line = line[0:-1].split(",")
     if "1" == line[0]:
         label = 1
     else:
         label = -1
     text = line[1].split(" ")
-    feature = {"BIAS": 1}
-    for i in range(len(text)-1):
-        pair = (text[i], text[i+1])
-        if None == feature.get(pair):
-            feature[pair] = 1
+    feature = {"BIAS": 1} # lift the data
+    for word in text:
+        if None == feature.get(word):
+            feature[word] = 1
         else:
-            feature[pair] += 1
+            feature[word] += 1
     return label, feature
 
 def get_value(classifier, feature):
+    # compute the dot product of classifier and feature(wx)
     value = 0
     for word in feature:
         if None == classifier.get(word):
@@ -39,8 +41,10 @@ def perceptron_pass1(lines, classifier):
         label, feature = get_label_feature(line)
         value = get_value(classifier, feature)
         if label * value > 0:
+            # prediction matches
             pass
         else:
+            # update each dimension of the classifier
             for word in feature:
                 if None == classifier.get(word):
                     classifier[word] = label * feature[word]
@@ -55,7 +59,7 @@ def perceptron_pass2(lines, classifier):
     count = 0
     p = IntProgress(max = n)
     display(p)
-    c = classifier
+    c = classifier # store the average value on each dimension of classifier
     random.shuffle(lines)
     for line in lines:
         count += 1
@@ -67,6 +71,7 @@ def perceptron_pass2(lines, classifier):
             for word in feature:
                 if None == classifier.get(word):
                     classifier[word] = label * feature[word]
+                    # little trick to update c
                     c[word] = label * feature[word] * (n - count) / n
                 else:
                     classifier[word] += label * feature[word]
@@ -77,6 +82,7 @@ def perceptron_pass2(lines, classifier):
     return c
 
 def test(lines, classifier):
+    # test the classifier with test set and return accuracy
     count = 0
     correct = 0
     p = IntProgress(max = len(lines))
@@ -95,7 +101,7 @@ train_path = "../hw2data_1/reviews_tr.csv"
 test_path = "../hw2data_1/reviews_te.csv"
 
 file = open(train_path, "r")
-_ = file.readline()
+_ = file.readline() # we don't need "label, text" line
 
 classifier = {}
 lines = file.readlines()
@@ -116,7 +122,7 @@ accuracy = test(lines, classifier)
 file.close()
 print(accuracy)
 """
-open ("./bigram", "wb") as f:
+open ("./unigram", "wb") as f:
     f.write(marshal.dump(classifier))
 f.close()
 """
