@@ -9,11 +9,11 @@ X and Y should be sorted data points(see below for more details).
 2. sigmoid.m:
 express sigmoid function here for better layout in nn.m
 
-3. sort.m:
+3. order.m:
 the script to re-arrange given X, Y data points in an incremental order of X.
 So that when ploting the data points, it will result in a curve instead of a block.
 
 
 When running the whole process(with X and Y already loaded in workspace):
-> sort;
+> order;
 > [w1, w2, b1, b2] = nn(12, 0.8, XX, YY);
